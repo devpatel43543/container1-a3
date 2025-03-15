@@ -5,7 +5,7 @@ steps:
   
 - name: 'gcr.io/cloud-builders/docker'
   id: 'build'
-  args: ['buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '-t','us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','--push','.']
+  args: ['buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '-t','us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','--push','./container1']
 
 # - name: 'gcr.io/cloud-builders/docker'
 #   args: ['tag', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
