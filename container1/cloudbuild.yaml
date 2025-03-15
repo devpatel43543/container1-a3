@@ -102,4 +102,7 @@ steps:
 #   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
 
 options:
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster' 
   logging: CLOUD_LOGGING_ONLY
