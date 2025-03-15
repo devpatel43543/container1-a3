@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: container1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: container1
+  template:
+    metadata:
+      labels:
+        app: container1
+    spec:
+      containers:
+      - name: container1
+        image: us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 6000
+        env:
+        - name: CONTAINER_2_URL
+          value: "http://container2-service:4000/calculate"
+        - name: FILE_DIRECTORY
+          value: "/data"
+        - name: PORT
+          value: "6000"
+        volumeMounts:
+        - name: pvc-data
+          mountPath: /data
+      volumes:
+      - name: pvc-data
+        persistentVolumeClaim:
+          claimName: a2-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: container1-service
+spec:
+  selector:
+    app: container1
+  ports:
+    - protocol: TCP
+      port: 6000
+      targetPort: 6000
+  type: LoadBalancer 
