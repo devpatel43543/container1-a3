@@ -1,28 +1,49 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'build'
-  args: ['buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['tag', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - 'container'
-  - 'clusters'
-  - 'get-credentials'
-  - 'a3-cluster'  
-  - '--zone'
-  - 'us-central1-c' 
-  - '--project'
-  - 'kubernetes-a3-453021'  
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['set', 'image', 'deployment/container1', 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
+  # Step 1: Set up Docker Buildx (for multi-platform builds)
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Setup Buildx'
+    args: ['buildx', 'create', '--use']
 
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'k8s/updated-deployment.yaml']
+  # Step 2: Build and push multi-platform images
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build and Push Image'
+    args:
+      - 'buildx'
+      - 'build'
+      - '--platform=linux/amd64,linux/arm64'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
+      - '--push'
+      - '.'
+
+  # Step 3: Authenticate to Kubernetes cluster
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Get Credentials'
+    args:
+      - 'container'
+      - 'clusters'
+      - 'get-credentials'
+      - 'a3-cluster'  
+      - '--zone'
+      - 'us-central1-c'
+      - '--project'
+      - 'kubernetes-a3-453021'
+
+  # Step 4: Update the Kubernetes deployment image
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'Update Deployment'
+    args:
+      - 'set'
+      - 'image'
+      - 'deployment/container1'
+      - 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
+
+  # Step 5: Apply any other Kubernetes configuration updates
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: 'Apply Updated Deployment'
+    args: ['apply', '-f', 'k8s/updated-deployment.yaml']
 
 images:
   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
