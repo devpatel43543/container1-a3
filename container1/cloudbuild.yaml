@@ -23,12 +23,21 @@ steps:
   - 'us-central1-c' 
   - '--project'
   - 'kubernetes-a3-453021'  
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
 
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['set', 'image', 'deployment/container1', 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
 
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/updated-deployment.yaml']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
 
 images:
   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
