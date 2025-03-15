@@ -27,3 +27,6 @@ steps:
 images:
   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
