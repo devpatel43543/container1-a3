@@ -12,6 +12,7 @@ console.log("File exists:", fileExists("file.dat"));
 const writeFile = (filePath, data) => {
   fs.writeFileSync(filePath, data);
 };
+console.log("Writing to file...");
 
 const calculate = async (req, res) => {
     const { file, product } = req.body;
