@@ -1,18 +1,80 @@
-steps:
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'Setup Buildx'
-  args: ['buildx', 'create', '--use']
+# steps:
+# - name: 'gcr.io/cloud-builders/docker'
+#   id: 'Setup Buildx'
+#   args: ['buildx', 'create', '--use']
   
+# - name: 'gcr.io/cloud-builders/docker'
+#   id: 'build'
+#   args: ['buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '-t','us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','--push','./container1']
+
+# # - name: 'gcr.io/cloud-builders/docker'
+# #   args: ['tag', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
+
+# # - name: 'gcr.io/cloud-builders/docker'
+# #   args: ['push', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
+
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   args:
+#   - 'container'
+#   - 'clusters'
+#   - 'get-credentials'
+#   - 'a3-cluster'  
+#   - '--zone'
+#   - 'us-central1-c' 
+#   - '--project'
+#   - 'kubernetes-a3-453021'  
+#   env:
+#   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+#   - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
+
+# - name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['set', 'image', 'deployment/container1', 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
+#   env:
+#   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+#   - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
+
+# - name: 'gcr.io/cloud-builders/kubectl'
+#   args: ['apply', '-f', 'k8s/deployment.yaml']
+#   env:
+#   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+#   - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
+
+# images:
+#   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
+#   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
+
+# options:
+#   logging: CLOUD_LOGGING_ONLY
+
+
+steps:
+# Set up QEMU for multi-architecture builds
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'setup-qemu'
+  args: ['run', '--rm', '--privileged', 'multiarch/qemu-user-static', '--reset', '-p', 'yes']
+
+# Set up Docker Buildx
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'setup-buildx'
+  args: ['buildx', 'create', '--name', 'mybuilder', '--use']
+
+# Build and push the image
 - name: 'gcr.io/cloud-builders/docker'
   id: 'build'
-  args: ['buildx', 'build', '--platform', 'linux/amd64,linux/arm64', '-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '-t','us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','--push','./container1']
+  args:
+  - 'buildx'
+  - 'build'
+  - '--builder=mybuilder'
+  - '--platform=linux/amd64,linux/arm64'
+  - '--cache-from=type=registry,ref=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
+  - '--push'
+  - '-t'
+  - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
+  - '-t'
+  - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
+  - './container1'
 
-# - name: 'gcr.io/cloud-builders/docker'
-#   args: ['tag', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
-
-# - name: 'gcr.io/cloud-builders/docker'
-#   args: ['push', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest']
-
+# Get cluster credentials
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - 'container'
@@ -23,25 +85,21 @@ steps:
   - 'us-central1-c' 
   - '--project'
   - 'kubernetes-a3-453021'  
-  env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
 
+# Update deployment with new image
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['set', 'image', 'deployment/container1', 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
-  env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
 
+# Apply deployment configuration
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/deployment.yaml']
-  env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=a3-cluster'
 
-images:
-  - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
-  - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
+# We don't need to explicitly list images here when using buildx with --push
+# Cloud Build won't actually find these images in its local cache
+# since buildx pushes directly to the registry
+# images:
+#   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
+#   - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
