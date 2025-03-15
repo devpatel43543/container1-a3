@@ -9,7 +9,7 @@ steps:
   
 - name: 'gcr.io/cloud-builders/docker'
   id: 'build'
-  args: ['buildx', 'build','--builder=mybuilder', '--platform', 'linux/amd64,linux/arm64', '--cache-from=type=registry,ref=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','--push','-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '-t','us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','./container1']
+  args: ['buildx', 'build','--builder=mybuilder', '--platform= linux/amd64,linux/arm64', '--cache-from=type=registry,ref=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','--push','-t', 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA', '-t','us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest','./container1']
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
@@ -27,11 +27,6 @@ steps:
 
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/deployment.yaml']
-
-
-images:
-  - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA'
-  - 'us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:latest'
 
 options:
   env:
