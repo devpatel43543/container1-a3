@@ -12,30 +12,23 @@ console.log("File exists:", fileExists("file.dat"));
 const writeFile = (filePath, data) => {
   fs.writeFileSync(filePath, data);
 };
-console.log("Writing to file... to maybe create it..");  
 
 const calculate = async (req, res) => {
     const { file, product } = req.body;
-    console.log("Received request with file:", file);
   
     if (!file || !product) {
       return res.status(400).json({ file: null, error: "Invalid JSON input." });
     }
   
     const filePath = path.join(FILE_DIRECTORY, file);
-    console.log("File path:", filePath);
-    
     if (!fileExists(file)) {
       return res.status(404).json({ file, error: "File not found." });
     }
-  
     try {
-        console.log(CONTAINER_2_URL, { file, product });
       const response = await axios.post(CONTAINER_2_URL, { file, product });
   
       res.status(response.status).json(response.data);
     } catch (error) {
-      console.error("Error forwarding request to Container 2:", error.message);
       res.status(500).json({ file,error: "Server error." });
     }
   };
