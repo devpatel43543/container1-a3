@@ -34,10 +34,11 @@ steps:
   - 'kubernetes-a3-453021'  
 
 - name: 'gcr.io/cloud-builders/kubectl'
-  args: ['set', 'image', 'deployment/container1', 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
+  args: ['apply', '-f', 'k8s/deployment.yaml']
 
 - name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'k8s/deployment.yaml']
+  args: ['set', 'image', 'deployment/container1', 'container1=us-central1-docker.pkg.dev/kubernetes-a3-453021/kubernetes-registry/devkumar640/container1:$SHORT_SHA']
+
 
 options:
   env:
