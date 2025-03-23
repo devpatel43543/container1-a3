@@ -10,6 +10,7 @@ const FILE_DIRECTORY = path.resolve(__dirname, process.env.FILE_DIRECTORY);
 const fileExists = (file) => fs.existsSync(path.join(FILE_DIRECTORY, file));
 console.log("File exists:", fileExists("file.dat"));
 console.log("hii")
+console.log("hello")
 const writeFile = (filePath, data) => {
   fs.writeFileSync(filePath, data);
 };
